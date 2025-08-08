@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   return (
@@ -24,9 +25,11 @@ const Navigation = () => {
           
           {/* Login/Sign Up */}
           <div className="flex-shrink-0">
-            <Button variant="insurance" className="text-base">
-              Login/Sign Up
-            </Button>
+            <Link to="/auth">
+              <Button variant="insurance" className="text-base">
+                Login/Sign Up
+              </Button>
+            </Link>
           </div>
           
           {/* Mobile menu button */}
