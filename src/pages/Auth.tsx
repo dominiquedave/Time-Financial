@@ -33,10 +33,10 @@ const Auth = () => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Redirect authenticated users to home
+
+        // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate('/');
+          navigate('/dashboard');
         }
       }
     );
@@ -45,10 +45,10 @@ const Auth = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Redirect if already authenticated
       if (session?.user) {
-        navigate('/');
+        navigate('/dashboard');
       }
     });
 
@@ -76,6 +76,7 @@ const Auth = () => {
           title: "Success",
           description: "Logged in successfully!",
         });
+        navigate('/dashboard'); // Redirect after successful login
       }
     } catch (error) {
       toast({

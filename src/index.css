@@ -108,6 +108,11 @@ All colors MUST be HSL.
 }
 
 @layer base {
+
+  #lovable-badge {
+      display: none !important;
+    }
+    
   * {
     @apply border-border;
   }
