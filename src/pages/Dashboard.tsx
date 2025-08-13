@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import ContactForm from "@/components/ContactForm";
 
 const BUSINESS_TITLE = "Time Financial Insurance";
 
@@ -104,6 +105,8 @@ const Dashboard = () => {
             )}
           </div>
         </section>
+        {/* Contact Form Section */}
+        <ContactForm />
       </main>
       <Footer />
     </div>
