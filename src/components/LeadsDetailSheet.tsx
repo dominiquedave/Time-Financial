@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { createClient } from '@supabase/supabase-js';
 import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
@@ -31,7 +33,32 @@ interface LeadsDetailSheetProps {
   onClose: () => void;
 }
 
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
 export function LeadsDetailSheet({ lead, isOpen, onClose }: LeadsDetailSheetProps) {
+  const [ownerName, setOwnerName] = useState<string>('');
+
+  useEffect(() => {
+    const fetchOwner = async () => {
+      if (lead?.owner_id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('user_id', lead.owner_id)
+          .single();
+
+        if (profile) {
+          setOwnerName(`${profile.first_name} ${profile.last_name}`);
+        }
+      }
+    };
+
+    fetchOwner();
+  }, [lead]);
+
   if (!lead) return null;
 
   const getStatusColor = (status?: string) => {
@@ -64,7 +91,7 @@ export function LeadsDetailSheet({ lead, isOpen, onClose }: LeadsDetailSheetProp
             </Badge>
           </div>
           <div className="text-sm text-gray-600">
-            <div>Owner: {lead.owner_id ? 'Assigned' : 'Unassigned'}</div>
+            <div>Owner: {lead.owner_id ? ownerName : 'Unassigned'}</div>
             <div>Created: {format(new Date(lead.created_at), 'MMM dd, yyyy')}</div>
           </div>
         </SheetHeader>
