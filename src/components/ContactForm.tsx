@@ -17,6 +17,7 @@ const supabase = createClient(
 )
 
 const ContactForm = () => {
+  const [user, setUser] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -38,8 +39,9 @@ const ContactForm = () => {
       const lastName = lastNameParts.join(' ')
 
       // Check for authenticated user
-      const { data: user } = await supabase.auth.getUser()
-      
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    
       // Prepare base lead data
       const leadData = {
         first_name: firstName,
@@ -55,10 +57,10 @@ const ContactForm = () => {
       }
 
       // Add user and owner IDs if authenticated
-      if (user?.user?.id) {
+      if (user.id) {
         Object.assign(leadData, {
-          user_id: user.user.id,
-          owner_id: user.user.id
+          user_id: user.id,
+          owner_id: user.id
         })
       }
 

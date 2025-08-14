@@ -55,6 +55,9 @@ const Dashboard = () => {
         return;
       }
       setUser(user);
+      // Check for authenticated user
+      // const { data: user } = await supabase.auth.getUser()
+      // console.log('Authenticated user:', user.id) 
 
     //   const { data } = await supabase
     //     .from("leads")
