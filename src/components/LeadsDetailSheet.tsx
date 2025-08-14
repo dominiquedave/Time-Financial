@@ -53,7 +53,7 @@ export function LeadsDetailSheet({ lead, isOpen, onClose }: LeadsDetailSheetProp
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="left" className="w-[400px] sm:w-[540px] bg-white border-r border-border">
+      <SheetContent side="right" className="w-[400px] sm:w-[540px] bg-white border-r border-border">
         <SheetHeader className="pb-6">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-xl font-bold text-black">
