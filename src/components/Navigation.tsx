@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const Navigation = () => {
+interface NavigationProps {
+  onGetQuoteClick: () => void;
+  onHomeClick: () => void;
+}
+
+const Navigation = ({ onGetQuoteClick, onHomeClick }: NavigationProps) => {
   return (
     <nav className="bg-background border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,10 +20,18 @@ const Navigation = () => {
           
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Button variant="nav" className="text-base">
+            <Button 
+              variant="nav" 
+              className="text-base"
+              onClick={onHomeClick}
+            >
               Home
             </Button>
-            <Button variant="nav" className="text-base">
+            <Button 
+              variant="nav" 
+              className="text-base"
+              onClick={onGetQuoteClick}
+            >
               Get Quote
             </Button>
           </div>

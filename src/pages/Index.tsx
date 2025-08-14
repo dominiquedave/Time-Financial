@@ -5,12 +5,24 @@ import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  const scrollToContact = () => {
+    document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToHero = () => {
+    document.getElementById('hero-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <HeroSection />
+      <Navigation onGetQuoteClick={scrollToContact} onHomeClick={scrollToHero} />
+      <div id="hero-section">
+        <HeroSection />
+      </div>
       <SpecialEnrollmentSection />
-      <ContactForm />
+      <div id="contact-section">
+        <ContactForm />
+      </div>
       <Footer />
     </div>
   );
