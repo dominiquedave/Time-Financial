@@ -27,29 +27,37 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
 
+  const checkUserAndRedirect = async (session: Session | null) => {
+    if (session?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if ((profile as any)?.role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  };
+
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-
-        // Redirect authenticated users to dashboard
-        if (session?.user) {
-          navigate('/dashboard');
-        }
+        checkUserAndRedirect(session);
       }
     );
 
-    // THEN check for existing session
+    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-
-      // Redirect if already authenticated
-      if (session?.user) {
-        navigate('/dashboard');
-      }
+      checkUserAndRedirect(session);
     });
 
     return () => subscription.unsubscribe();
@@ -60,7 +68,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: loginPassword,
       });
@@ -76,7 +84,7 @@ const Auth = () => {
           title: "Success",
           description: "Logged in successfully!",
         });
-        navigate('/dashboard'); // Redirect after successful login
+        await checkUserAndRedirect(data.session); // Replace direct navigation with role check
       }
     } catch (error) {
       toast({

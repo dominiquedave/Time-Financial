@@ -14,7 +14,7 @@ const supabase = createClient(
 
 const BUSINESS_TITLE = "Time Financial Insurance";
 
-function DashboardNavigation({ onSignOut }: { onSignOut: () => void }) {
+function DashboardNavigation({ onSignOut, isAdmin }: { onSignOut: () => void; isAdmin?: boolean }) {
   return (
     <nav className="bg-background border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,13 +25,20 @@ function DashboardNavigation({ onSignOut }: { onSignOut: () => void }) {
               {BUSINESS_TITLE}
             </h1>
           </div>
-          {/* Centered Home Link */}
-          <div className="flex-1 flex justify-center">
+          {/* Centered Navigation */}
+          <div className="flex-1 flex justify-center space-x-4">
             <Link to="/dashboard">
               <Button variant="nav" className="text-base">
                 Home
               </Button>
             </Link>
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="outline" className="border-border hover:bg-muted text-base">
+                  Admin Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
           {/* Sign Out Button */}
           <div className="flex-shrink-0">
@@ -51,6 +58,7 @@ function DashboardNavigation({ onSignOut }: { onSignOut: () => void }) {
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [leads, setLeads] = useState<any[]>([]);
   const [selectedLead, setSelectedLead] = useState<any>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -60,10 +68,20 @@ const Dashboard = () => {
     const fetchUserAndLeads = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/"); // redirect if not logged in
+        navigate("/");
         return;
       }
       setUser(user);
+
+      // Check if user has admin role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      setIsAdmin(profile?.role === 'admin');
+
       // Fetch leads for the user
       const { data } = await supabase
         .from('leads')
@@ -92,7 +110,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <DashboardNavigation onSignOut={handleSignOut} />
+      <DashboardNavigation onSignOut={handleSignOut} isAdmin={isAdmin} />
       <main className="flex-1 flex flex-col items-center justify-center px-4">
         {/* Hero-style welcome */}
         <section className="w-full max-w-3xl text-center py-12">
