@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+// import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import ContactForm from "@/components/ContactForm";
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
 
 const BUSINESS_TITLE = "Time Financial Insurance";
 
@@ -55,16 +61,13 @@ const Dashboard = () => {
         return;
       }
       setUser(user);
-      // Check for authenticated user
-      // const { data: user } = await supabase.auth.getUser()
-      // console.log('Authenticated user:', user.id) 
+      // Fetch leads for the user
+      const { data } = await supabase
+        .from('leads')
+        .select("*")
+        .eq("user_id", user.id);
 
-    //   const { data } = await supabase
-    //     .from("leads")
-    //     .select("*")
-    //     .eq("user_id", user.id);
-
-    //   setLeads(data || []);
+      setLeads(data || []);
     };
     fetchUserAndLeads();
   }, [navigate]);
