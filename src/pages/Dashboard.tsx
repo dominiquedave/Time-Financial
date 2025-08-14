@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import ContactForm from "@/components/ContactForm";
-import { LeadsDetailSheet } from "@/components/LeadsDetailSheet";
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -52,8 +51,6 @@ function DashboardNavigation({ onSignOut }: { onSignOut: () => void }) {
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [leads, setLeads] = useState<any[]>([]);
-  const [selectedLead, setSelectedLead] = useState<any>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,16 +77,6 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const handleLeadClick = (lead: any) => {
-    setSelectedLead(lead);
-    setIsSheetOpen(true);
-  };
-
-  const handleCloseSheet = () => {
-    setIsSheetOpen(false);
-    setSelectedLead(null);
-  };
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <DashboardNavigation onSignOut={handleSignOut} />
@@ -112,17 +99,12 @@ const Dashboard = () => {
             ) : (
               <ul className="space-y-3">
                 {leads.map((lead) => (
-                  <li 
-                    key={lead.id} 
-                    className="p-4 border rounded-lg flex flex-col md:flex-row md:items-center md:justify-between bg-background hover:bg-muted/50 cursor-pointer transition-colors"
-                    onClick={() => handleLeadClick(lead)}
-                  >
+                  <li key={lead.id} className="p-4 border rounded-lg flex flex-col md:flex-row md:items-center md:justify-between bg-background">
                     <div>
-                      <span className="font-medium text-lg">
-                        {[lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'No name'}
-                      </span>
+                      <span className="font-medium text-lg">{lead.name}</span>
                       <div className="text-sm text-muted-foreground">{lead.email}</div>
                     </div>
+                    {/* Add more lead details/actions here if needed */}
                   </li>
                 ))}
               </ul>
@@ -133,12 +115,6 @@ const Dashboard = () => {
         <ContactForm />
       </main>
       <Footer />
-      
-      <LeadsDetailSheet 
-        lead={selectedLead}
-        isOpen={isSheetOpen}
-        onClose={handleCloseSheet}
-      />
     </div>
   );
 };
