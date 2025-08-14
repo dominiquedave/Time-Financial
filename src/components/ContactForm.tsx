@@ -9,6 +9,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
 
 const ContactForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -23,10 +29,65 @@ const ContactForm = () => {
     zipCode: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission here
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      // Split full name into first and last name
+      const [firstName, ...lastNameParts] = formData.fullName.split(' ')
+      const lastName = lastNameParts.join(' ')
+
+      // Check for authenticated user
+      const { data: user } = await supabase.auth.getUser()
+      
+      // Prepare base lead data
+      const leadData = {
+        first_name: firstName,
+        last_name: lastName,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state,
+        ssn: formData.ssn,
+        date_of_birth: formData.dob,
+        address: formData.address,
+        zip_code: formData.zipCode,
+        status: 'new'
+      }
+
+      // Add user and owner IDs if authenticated
+      if (user?.user?.id) {
+        Object.assign(leadData, {
+          user_id: user.user.id,
+          owner_id: user.user.id
+        })
+      }
+
+      const { error } = await supabase
+        .from('leads')
+        .insert(leadData)
+
+      if (error) throw error
+      
+      // Show success message or redirect
+      alert('Thank you for your submission!')
+      
+      // Reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        state: "",
+        ssn: "",
+        dob: undefined,
+        address: "",
+        zipCode: ""
+      })
+      setCurrentStep(1)
+      
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      alert('There was an error submitting your form. Please try again.')
+    }
   };
 
   const handleNext = (e: React.FormEvent) => {
