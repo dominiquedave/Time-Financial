@@ -47,25 +47,20 @@ const AdminDashboard = () => {
         }
         setUser(user);
 
-        // Check if user has admin role
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (!profile || (profile as any).role !== 'admin') {
+        // Check role from user metadata
+        const userRole = user.user_metadata.role;
+        if (userRole !== 'admin') {
           navigate("/dashboard");
           return;
         }
-        
-        setUserProfile(profile);
 
-        // Fetch all users for admin dashboard
+        // console log current users auth.jwt()
+        console.log("Current User JWT:", user);
+
+        // Fetch data needed for admin dashboard
         const profilesResponse = await supabase.from('profiles').select('*');
         setAllUsers(profilesResponse.data || []);
         
-        // Fetch all leads
         const { data: leads } = await supabase
           .from('leads')
           .select('*')

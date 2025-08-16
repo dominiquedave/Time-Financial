@@ -29,13 +29,10 @@ const Auth = () => {
 
   const checkUserAndRedirect = async (session: Session | null) => {
     if (session?.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-
-      if ((profile as any)?.role === 'admin') {
+      // Use role from user metadata instead of database lookup
+      const userRole = session.user.user_metadata.role;
+      
+      if (userRole === 'admin') {
         navigate("/admin");
       } else {
         navigate("/dashboard");
@@ -122,6 +119,7 @@ const Auth = () => {
           data: {
             first_name: signupFirstName,
             last_name: signupLastName,
+            role: 'user' // Default role for new signups
           }
         }
       });
